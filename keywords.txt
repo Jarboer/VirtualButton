@@ -1,0 +1,4 @@
+VirtualButton   KEYWORD1
+toggleSwitch    KEYWORD2
+virtualDigitalRead  KEYWORD2
+serialReadByte  KEYWORD2
