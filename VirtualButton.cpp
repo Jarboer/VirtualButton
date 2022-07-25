@@ -5,21 +5,19 @@
 #include "Arduino.h"
 #include "VirtualButton.h"
 
-/* This is a constructor for VirtualButton which takes a reference to userButtonVal and the toggleSwitchesON array.
-   _userButtonVal will refer to the reference stored userButtonVal and so when ever you change that variable in the sketch
-   _userButtonVal will also be able to reference the same value. */
-/*  NOTE: To pass the refence, when intializing VirtualButton, the variable passed to userButtonVal must have & before 
-   the variable name like this: &myVariable*/
-VirtualButton::VirtualButton(byte *userButtonVal, bool toggleSwitchesON[]) {
-  _userButtonVal = userButtonVal;
+/* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
+VirtualButton::VirtualButton(bool toggleSwitchesON[]) {
+  userButtonVal = 0;
+  helperRanOnce = false;
   _toggleSwitchesON = toggleSwitchesON;
 }
 
-/* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
-/* NOTE: Use this when you don't need to use virtualDigitalRead.*/
-VirtualButton::VirtualButton(bool toggleSwitchesON[]) {
-  _userButtonVal = 0;
-  _toggleSwitchesON = toggleSwitchesON;
+/* This is a constructor for VirtualButton which takes no arguments.
+   NOTE: Use this when you only need access to digitalRead()*/
+VirtualButton::VirtualButton() {
+  userButtonVal = 0;
+  helperRanOnce = false;
+  _toggleSwitchesON = {};
 }
 
 // This method switches the toggleSwitchesON value and return it
@@ -37,15 +35,31 @@ bool VirtualButton::toggleSwitch(int switchNum) {
     it returns HIGH, otherwise, it returns LOW.*/
 int VirtualButton::virtualDigitalRead(byte buttonPin) {
 
+  /* If helperRanOnce is false then display an error message to inform the 
+     user that they must run virtualDigitalReadHelper() first to monitor thier input*/
+  if (helperRanOnce == false) {
+    Serial.println(F("You need to run virtualDigitalReadHelper() to monitor inputs before this method will work."));
+  }
+
   // Check if the user entered a value and if it is a configured button
-  if (*_userButtonVal != 0 && buttonPin == *_userButtonVal) {
+  if (userButtonVal != 0 && buttonPin == userButtonVal) {
     // Reset the userButtonVal to prevent recursion
-    *_userButtonVal = 0;
+    userButtonVal = 0;
     // It is a button so return HIGH
     return HIGH;
   }
 
   return LOW;  // It isn't so return LOW
+}
+
+/* This method is used to monitor the input from the user in the 
+   Serial Monitor for the virtualDigitalRead() method*/
+void VirtualButton::virtualDigitalReadHelper() {
+  // The method was called once
+  helperRanOnce = true;
+
+  // Set the userButtonVal to what the user typed
+  userButtonVal = serialReadByte();
 }
 
 /*  This method is used to read from the serial monitor and try to convert the value 

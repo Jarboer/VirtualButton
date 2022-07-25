@@ -3,23 +3,15 @@
 // Used to define how many switches the Arduino will handle
 const byte SWITCH_COUNT = 3;
 
-// Used to set the input pins for the sensor pins being read
-// Set to the value of the pin on the Arduino
+/* Used to set the input pins for the sensor pins being read. 
+   These are the values that you will enter to toggle a switch*/
 const char sensorPins[SWITCH_COUNT] = { 2, 3, 4 };
-
-// Used to store the value entered by the user for the virtual button
-byte inputByte = 0;
 
 // Used to store the button's state
 byte buttonState = LOW;
 
-// Used to store if the virutal toggle switch is ON (true)
-// NOTE: By default they are all false (OFF)
-bool toggleSwitchON[SWITCH_COUNT];
-
-// Set up the virtual button
-// NOTE: You must include the & before the inputByte varible when using this method
-VirtualButton vb(&inputByte, toggleSwitchON);
+// Set up the VirtualButton class
+VirtualButton vb;
 
 void setup() {
   // Set up the serial monitor
@@ -27,13 +19,9 @@ void setup() {
 }
 
 void loop() {
-  // Set the value entered by the user for the virtual button
-  inputByte = vb.serialReadByte();
-
-  // Show the value entered
-  if (inputByte != 0) {
-    Serial.println(inputByte);
-  }
+  // Call the method to monitor the Serial Monitor for inputs
+  // NOTE: This must be called before virtualDigitalRead()
+  vb.virtualDigitalReadHelper();
 
   // Loop for the number of switches to read thier coresponding pins
   for (int machineIndex = 0; machineIndex < SWITCH_COUNT; machineIndex++) {

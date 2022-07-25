@@ -8,7 +8,7 @@ const byte SWITCH_COUNT = 3;
 // NOTE: By default they are all false (OFF)
 bool toggleSwitchON[SWITCH_COUNT];
 
-// Set up the virtual button
+// Set up the VirtualButton class
 VirtualButton vb(toggleSwitchON);
 
 void setup() {

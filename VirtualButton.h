@@ -9,14 +9,19 @@
 
 class VirtualButton {
     public:
-        VirtualButton(byte *userButtonVal, bool toggleSwitchesON[]);
+        /* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
         VirtualButton(bool toggleSwitchesON[]);
+        /* This is a constructor for VirtualButton which takes no arguments.
+        NOTE: Use this when you only need access to digitalRead()*/
+        VirtualButton();
         bool toggleSwitch(int switchNum);
+        void virtualDigitalReadHelper();
         int virtualDigitalRead(byte buttonPin);
         byte serialReadByte();
     private:
-     byte *_userButtonVal; // NOTE: When you refer to _userButtonVal in the VirtualButton.cpp class you must use *_userButtonVal to get the value
-     bool *_toggleSwitchesON;
+        byte userButtonVal;
+        bool helperRanOnce;
+        bool *_toggleSwitchesON;
 };
 
 #endif
