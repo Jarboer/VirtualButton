@@ -38,7 +38,7 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
   /* If helperRanOnce is false then display an error message to inform the 
      user that they must run virtualDigitalReadHelper() first to monitor thier input*/
   if (helperRanOnce == false) {
-    Serial.println(F("You need to run virtualDigitalReadHelper() to monitor inputs before this method will work."));
+    Serial.println(F("You need to run virtualDigitalReadHelper() first to monitor inputs."));
   }
 
   // Check if the user entered a value and if it is a configured button
@@ -82,12 +82,9 @@ byte VirtualButton::serialReadByte() {
   }
 
   // Check if the value is valid
-  if (serialInt == 0 || serialInt < -1) {
+  if (serialInt == 0 || serialInt < -1 || serialInt > 255) {
     // Display the error
-    Serial.println(F("An invalid character was entered (the input must be an int and > 0). Try again."));
-  } else if (serialInt > 255) {  // Check if the value is too large
-    // Display the error
-    Serial.println(F("The value entered was too large (must be <= 255). Try again."));
+    Serial.println(F("Invalid char val entered (the input must be an int val, > 0 and <= 255). Try again."));
   } else if (serialInt != -1) {  // Otherwise, the value is valid
     // Convert the int to a byte and return it
     return byte(serialInt);
