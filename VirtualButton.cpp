@@ -30,12 +30,11 @@ bool VirtualButton::toggleSwitch(int switchNum) {
   return _toggleSwitchesON[switchNum];
 }
 
-/*  This method is used to simulate digitalRead() by reading the input byte 
+/*  This method is used to simulate digitalRead() by reading the input byte
     from the user and check if the value is a configured button. If it is
     it returns HIGH, otherwise, it returns LOW.*/
 int VirtualButton::virtualDigitalRead(byte buttonPin) {
-
-  /* If helperRanOnce is false then display an error message to inform the 
+  /* If helperRanOnce is false then display an error message to inform the
      user that they must run virtualDigitalReadHelper() first to monitor thier input*/
   if (helperRanOnce == false) {
     Serial.println(F("You need to run virtualDigitalReadHelper() first to monitor inputs."));
@@ -52,7 +51,7 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
   return LOW;  // It isn't so return LOW
 }
 
-/* This method is used to monitor the input from the user in the 
+/* This method is used to monitor the input from the user in the
    Serial Monitor for the virtualDigitalRead() method*/
 void VirtualButton::virtualDigitalReadHelper() {
   // The method was called once
@@ -62,8 +61,8 @@ void VirtualButton::virtualDigitalReadHelper() {
   userButtonVal = serialReadByte();
 }
 
-/*  This method is used to read from the serial monitor and try to convert the value 
-    to a byte. It only accepts values from 1 to 255, otherwise it will display an 
+/*  This method is used to read from the serial monitor and try to convert the value
+    to a byte. It only accepts values from 1 to 255, otherwise it will display an
     error and return 0.*/
 byte VirtualButton::serialReadByte() {
   // Used to store the serial monitor value as an int
