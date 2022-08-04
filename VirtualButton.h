@@ -8,21 +8,21 @@
 #include "Arduino.h"
 
 class VirtualButton {
- public:
-  /* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
-  VirtualButton(bool toggleSwitchesON[]);
-  /* This is a constructor for VirtualButton which takes no arguments.
-  NOTE: Use this when you only need access to digitalRead()*/
-  VirtualButton();
-  bool toggleSwitch(int switchNum);
-  void virtualDigitalReadHelper();
-  int virtualDigitalRead(byte buttonPin);
-  byte serialReadByte();
+  public:
+    /* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
+    VirtualButton(bool toggleSwitchesON[]);
+    /* This is a constructor for VirtualButton which takes no arguments.
+    NOTE: Use this when you only need access to digitalRead()*/
+    VirtualButton();
+    bool toggleSwitch(int switchNum);
+    void virtualDigitalReadHelper();
+    int virtualDigitalRead(byte buttonPin);
+    byte serialReadByte();
 
- private:
-  byte userButtonVal;
-  bool helperRanOnce;
-  bool *_toggleSwitchesON;
+  private:
+    byte userButtonVal;
+    bool helperRanOnce;
+    bool *_toggleSwitchesON;
 };
 
 #endif

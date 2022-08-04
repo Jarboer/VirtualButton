@@ -20,7 +20,7 @@ VirtualButton::VirtualButton() {
   _toggleSwitchesON = {};
 }
 
-// This method switches the toggleSwitchesON value and return it
+// This method switches the toggleSwitchesON value and returns it
 bool VirtualButton::toggleSwitch(int switchNum) {
   if (_toggleSwitchesON[switchNum] == true) {
     _toggleSwitchesON[switchNum] = false;
@@ -37,7 +37,10 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
   /* If helperRanOnce is false then display an error message to inform the
      user that they must run virtualDigitalReadHelper() first to monitor thier input*/
   if (helperRanOnce == false) {
-    Serial.println(F("You need to run virtualDigitalReadHelper() first to monitor inputs."));
+    Serial.println(F("ERROR: You must call virtualDigitalReadHelper() first to monitor inputs. Terminating..."));
+    while(true) {
+      // Do nothing
+    }
   }
 
   // Check if the user entered a value and if it is a configured button
@@ -83,7 +86,7 @@ byte VirtualButton::serialReadByte() {
   // Check if the value is valid
   if (serialInt == 0 || serialInt < -1 || serialInt > 255) {
     // Display the error
-    Serial.println(F("Invalid char val entered (the input must be an int val, > 0 and <= 255). Try again."));
+    Serial.println(F("Invalid value entered (the input must be an int, > 0 and <= 255). Try again."));
   } else if (serialInt != -1) {  // Otherwise, the value is valid
     // Convert the int to a byte and return it
     return byte(serialInt);
