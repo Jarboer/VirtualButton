@@ -7,16 +7,16 @@
 
 /* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
 VirtualButton::VirtualButton(bool toggleSwitchesON[]) {
-  userButtonVal = 0;
-  helperRanOnce = false;
+  _userButtonVal = 0;
+  _helperRanOnce = false;
   _toggleSwitchesON = toggleSwitchesON;
 }
 
 /* This is a constructor for VirtualButton which takes no arguments.
    NOTE: Use this when you only need access to digitalRead()*/
 VirtualButton::VirtualButton() {
-  userButtonVal = 0;
-  helperRanOnce = false;
+  _userButtonVal = 0;
+  _helperRanOnce = false;
   _toggleSwitchesON = {};
 }
 
@@ -34,19 +34,19 @@ bool VirtualButton::toggleSwitch(int switchNum) {
     from the user and check if the value is a configured button. If it is
     it returns HIGH, otherwise, it returns LOW.*/
 int VirtualButton::virtualDigitalRead(byte buttonPin) {
-  /* If helperRanOnce is false then display an error message to inform the
+  /* If _helperRanOnce is false then display an error message to inform the
      user that they must run virtualDigitalReadHelper() first to monitor thier input*/
-  if (helperRanOnce == false) {
-    Serial.println(F("ERROR: You must call virtualDigitalReadHelper() first to monitor inputs. Terminating..."));
-    while(true) {
+  if (_helperRanOnce == false) {
+    Serial.println(F("ERROR: Call virtualDigitalReadHelper() first to monitor inputs. Stopping..."));
+    while (true) {
       // Do nothing
     }
   }
 
   // Check if the user entered a value and if it is a configured button
-  if (userButtonVal != 0 && buttonPin == userButtonVal) {
-    // Reset the userButtonVal to prevent recursion
-    userButtonVal = 0;
+  if (_userButtonVal != 0 && buttonPin == _userButtonVal) {
+    // Reset the _userButtonVal to prevent recursion
+    _userButtonVal = 0;
     // It is a button so return HIGH
     return HIGH;
   }
@@ -58,10 +58,10 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
    Serial Monitor for the virtualDigitalRead() method*/
 void VirtualButton::virtualDigitalReadHelper() {
   // The method was called once
-  helperRanOnce = true;
+  _helperRanOnce = true;
 
   // Set the userButtonVal to what the user typed
-  userButtonVal = serialReadByte();
+  _userButtonVal = serialReadByte();
 }
 
 /*  This method is used to read from the serial monitor and try to convert the value

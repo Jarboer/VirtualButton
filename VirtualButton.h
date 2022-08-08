@@ -20,8 +20,8 @@ class VirtualButton {
     byte serialReadByte();
 
   private:
-    byte userButtonVal;
-    bool helperRanOnce;
+    byte _userButtonVal;
+    bool _helperRanOnce;
     bool *_toggleSwitchesON;
 };
 
