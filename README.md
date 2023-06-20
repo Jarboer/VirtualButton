@@ -5,3 +5,7 @@ An Ardiuno library that allows you to make virutal buttons. It is used to simula
 ## Information
 
 * Category: Sensors
+
+## How to Install Library
+
+... - Finish this lol
