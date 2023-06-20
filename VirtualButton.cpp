@@ -1,38 +1,26 @@
-/*
-  VirtualButton.cpp - Library for reading from a virtual button aka the keyboard
-  Created by Jarrett on July 21, 2022
-*/
-#include "Arduino.h"
+/**
+ * VirtualButton.cpp - Library for reading from a virtual button aka the keyboard
+ * Created by Jarrett on July 21, 2022
+ */
 #include "VirtualButton.h"
 
-/* This is a constructor for VirtualButton which takes a for toggleSwitchesON array.*/
 VirtualButton::VirtualButton(bool toggleSwitchesON[]) {
   _userButtonVal = 0;
   _helperRanOnce = false;
   _toggleSwitchesON = toggleSwitchesON;
 }
 
-/* This is a constructor for VirtualButton which takes no arguments.
-   NOTE: Use this when you only need access to digitalRead()*/
 VirtualButton::VirtualButton() {
   _userButtonVal = 0;
   _helperRanOnce = false;
   _toggleSwitchesON = {};
 }
 
-// This method switches the toggleSwitchesON value and returns it
 bool VirtualButton::toggleSwitch(int switchNum) {
-  if (_toggleSwitchesON[switchNum] == true) {
-    _toggleSwitchesON[switchNum] = false;
-  } else {
-    _toggleSwitchesON[switchNum] = true;
-  }
+  _toggleSwitchesON[switchNum] = !_toggleSwitchesON[switchNum];  // The ! switches the bool value
   return _toggleSwitchesON[switchNum];
 }
 
-/*  This method is used to simulate digitalRead() by reading the input byte
-    from the user and check if the value is a configured button. If it is
-    it returns HIGH, otherwise, it returns LOW.*/
 int VirtualButton::virtualDigitalRead(byte buttonPin) {
   /* If _helperRanOnce is false then display an error message to inform the
      user that they must run virtualDigitalReadHelper() first to monitor thier input*/
@@ -45,7 +33,7 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
 
   // Check if the user entered a value and if it is a configured button
   if (_userButtonVal != 0 && buttonPin == _userButtonVal) {
-    // Reset the _userButtonVal to prevent recursion
+    // Reset the _userButtonVal to prevent getting stuck running virtualDigitalRead
     _userButtonVal = 0;
     // It is a button so return HIGH
     return HIGH;
@@ -54,44 +42,81 @@ int VirtualButton::virtualDigitalRead(byte buttonPin) {
   return LOW;  // It isn't so return LOW
 }
 
-/* This method is used to monitor the input from the user in the
-   Serial Monitor for the virtualDigitalRead() method*/
 void VirtualButton::virtualDigitalReadHelper() {
   // The method was called once
   _helperRanOnce = true;
 
-  // Set the userButtonVal to what the user typed
-  _userButtonVal = serialReadByte();
+  // Call serialReadByte read to what the user typed
+  // It also sets the _userButtonVal
+  serialReadByte();
 }
 
-/*  This method is used to read from the serial monitor and try to convert the value
-    to a byte. It only accepts values from 1 to 255, otherwise it will display an
-    error and return 0.*/
-byte VirtualButton::serialReadByte() {
-  // Used to store the serial monitor value as an int
-  int serialInt = -1;
+void VirtualButton::serialReadByte() {
+  /* NOTE: Local static variables allow the data to update without being reset
+           while prevent them from being called outside this function.
 
-  // Check if there is characters available
-  if (Serial.available() > 0) {
-    // Store the parsed integer
-    serialInt = Serial.parseInt();
+           Also, variables cannot be declared within a case statement*/
+  // Set how much serial data we expect before a newline
+  const unsigned int MAX_INPUT = 50;
+  // Used to store the full input from the user (constructed byte by byte)
+  static char fullInput[MAX_INPUT];
+  // Used to store the position of the current byte
+  static unsigned int inputPosition = 0;
+
+  byte inputByte;
+
+  // While the serial data is available, process it
+  while (Serial.available() > 0) {
+    inputByte = Serial.read();
+
+    switch (inputByte) {
+      case '\r':                          // Carriage return
+      case '\n':                          // End of new line
+        fullInput[inputPosition] = '\0';  // Add terminating null byte
+
+        // Call this method to convert fullInput to a byte
+        convertToByte(fullInput, inputPosition);
+
+        // Reset buffer's inputPosition for next time
+        inputPosition = 0;
+        break;
+
+      default:
+        // Keep adding to the fullInput if it isn't full (MAX_INPUT - 1 to allow for terminating null byte)
+        if (inputPosition < (MAX_INPUT - 1)) {
+          // Add the inputByte to the array (converts from byte to char automatically)
+          fullInput[inputPosition] = inputByte;
+          inputPosition++;  // Increase the inputPosition
+        }
+        break;
+    }
+  }
+}
+
+void VirtualButton::convertToByte(const char fullInput[], const unsigned int inputPosition) {
+  // Used to store if the fullInput is a positive integer
+  bool positiveInt = true;
+  // Used to store the integer entered by the user (fullInput converted)
+  int serialInt = 0;
+
+  // Loop through all the characters
+  for (int i = 0; i < inputPosition; i++) {
+    // If the character isn't a digit set postInt to false
+    if (!isDigit(fullInput[i])) {
+      positiveInt = false;
+      break;  // Leave loop early
+    }
   }
 
-  // If serialInt isn't the default value
-  // This is to make -1 result in an error (a timeout error)
-  if (serialInt != -1) {
-    Serial.read();  // Read the new line char from the buffer
-  }
+  // Convert the fullInput to an int and store it
+  serialInt = atoi(fullInput);
 
-  // Check if the value is valid
-  if (serialInt == 0 || serialInt < -1 || serialInt > 255) {
+  // Check if the value is invalid
+  if (positiveInt == false || serialInt <= 0 || serialInt > 255) {
     // Display the error
     Serial.println(F("Invalid value entered (the input must be an int, > 0 and <= 255). Try again."));
-  } else if (serialInt != -1) {  // Otherwise, the value is valid
-    // Convert the int to a byte and return it
-    return byte(serialInt);
+  } else {  // Otherwise, the value is valid
+    // Convert the int to a byte and store it
+    _userButtonVal = byte(serialInt);
   }
-
-  // Return 0 as there was an error
-  return 0;
 }
