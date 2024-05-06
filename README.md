@@ -16,4 +16,4 @@ An Ardiuno library that allows you to make virutal buttons. It is used to simula
 
 See the examples:
 * [ToggleSwitchExample](examples/ToggleSwitchExample) - Shows how to setup and use a virtal toggle switch.
-* [VirtualDigitalReadExample](examples/VirtualDigitalReadExample)- Shows how to setup and use virtual digital read.
+* [VirtualDigitalReadExample](examples/VirtualDigitalReadExample)- Shows how to setup and use virtual digitalRead().
